@@ -28,7 +28,6 @@ var Get = React.createClass({
     render: function () {
         return (
             <div>
-                <h1>Get</h1>
                 <p>{this.state.password}</p>
             </div>
         );

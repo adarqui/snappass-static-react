@@ -8,10 +8,10 @@ var Set = React.createClass({
             result: ''
         };
     },
-    setPassword: function(password) {
+    setPassword: function(password, expire) {
         $.ajax({
             type: 'POST',
-            url: '/pass/'+password+'/day',
+            url: '/pass/'+password+'/'+expire,
             dataType: 'text',
             success: function(data) {
                 console.log('data',data);
@@ -27,10 +27,8 @@ var Set = React.createClass({
         console.log('submit');
         e.preventDefault();
         var password = React.findDOMNode(this.refs.password).value;
-        if (!password) {
-            return;
-        }
-        this.setPassword(password);
+        var expire = React.findDOMNode(this.refs.expire).value;
+        this.setPassword(password, expire);
         React.findDOMNode(this.refs.password).value = '';
     },
     render: function () {
@@ -39,11 +37,20 @@ var Set = React.createClass({
             <div>
                 <form className="setForm" onSubmit={this.handleSubmit}>
                     <div className="form-group col-md-2">
-                        <input className="form-control" type="text" placeholder="password" ref="password" />
+                        <input required className="form-control" type="text" placeholder="password" ref="password" />
+                    </div>
+                    <div className="form-group col-md-2">
+                        <select className="form-control" ref="expire">
+                            <option>hour</option>
+                            <option>day</option>
+                            <option>week</option>
+                        </select>
                     </div>
                     <input className="btn btn-default" type="submit" value="Post" />
                 </form>
-                <a href={result_url}>{this.state.result}</a>
+                <div className="col-md-12">
+                    <a href={result_url}>{this.state.result}</a>
+                </div>
             </div>
         );
     }

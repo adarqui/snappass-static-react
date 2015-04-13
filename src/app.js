@@ -36,6 +36,7 @@ var routes = (
         <Route url="/key/" name="set" handler={Set} />
         <Route name="get" handler={Get} path="/get/:id" />
         <Route name="about" handler={About} />
+        <DefaultRoute handler={Set}/>
     </Route>
 );
 
