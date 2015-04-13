@@ -33,3 +33,11 @@ go build
 ```
 
 Then, load up the webserver in chrome: http://<host>:5000
+
+
+Compiling
+---------
+
+```
+gulp js
+```
