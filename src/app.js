@@ -10,6 +10,8 @@ var RouteHandler = Router.RouteHandler;
 var Set = require('./components/Set');
 var Get = require('./components/Get');
 var About = require('./components/About');
+var Header = require('./components/Header');
+var NavBar = require('./components/NavBar');
 
 var App = React.createClass({
 
@@ -21,10 +23,8 @@ var App = React.createClass({
         var name = this.context.router.getCurrentPath();
         return (
             <div>
-                <ul>
-                    <li><Link to="set">Set</Link></li>
-                    <li><Link to="about">About</Link></li>
-                </ul>
+                <Header />
+                <NavBar />
                 <RouteHandler key={name} />
             </div>
         );

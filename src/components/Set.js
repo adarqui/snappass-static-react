@@ -37,11 +37,12 @@ var Set = React.createClass({
         var result_url = '/#get/'+this.state.result;
         return (
             <div>
-                <h1>Set</h1>
-                    <form className="setForm" onSubmit={this.handleSubmit}>
-                        <input type="text" placeholder="password" ref="password" />
-                        <input type="submit" value="Post" />
-                    </form>
+                <form className="setForm" onSubmit={this.handleSubmit}>
+                    <div className="form-group col-md-2">
+                        <input className="form-control" type="text" placeholder="password" ref="password" />
+                    </div>
+                    <input className="btn btn-default" type="submit" value="Post" />
+                </form>
                 <a href={result_url}>{this.state.result}</a>
             </div>
         );
