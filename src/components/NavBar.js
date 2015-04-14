@@ -12,7 +12,6 @@ var NavBar = React.createClass({
     render: function() {
         var locations = this.state.locations.map(function(location) {
             var active = location.active || this.isActive(location.name) ? "active" : "";
-//            var active = RouterisActive(location.name);
             return (
                 <li className={active}><Link to={location.name}>{location.title}</Link></li>
             );

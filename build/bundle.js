@@ -11,6 +11,8 @@ var RouteHandler = Router.RouteHandler;
 var Set = require('./components/Set');
 var Get = require('./components/Get');
 var About = require('./components/About');
+var Header = require('./components/Header');
+var NavBar = require('./components/NavBar');
 
 var App = React.createClass({displayName: "App",
 
@@ -22,10 +24,8 @@ var App = React.createClass({displayName: "App",
         var name = this.context.router.getCurrentPath();
         return (
             React.createElement("div", null, 
-                React.createElement("ul", null, 
-                    React.createElement("li", null, React.createElement(Link, {to: "set"}, "Set")), 
-                    React.createElement("li", null, React.createElement(Link, {to: "about"}, "About"))
-                ), 
+                React.createElement(Header, null), 
+                React.createElement(NavBar, null), 
                 React.createElement(RouteHandler, {key: name})
             )
         );
@@ -36,7 +36,8 @@ var routes = (
     React.createElement(Route, {handler: App}, 
         React.createElement(Route, {url: "/key/", name: "set", handler: Set}), 
         React.createElement(Route, {name: "get", handler: Get, path: "/get/:id"}), 
-        React.createElement(Route, {name: "about", handler: About})
+        React.createElement(Route, {name: "about", handler: About}), 
+        React.createElement(DefaultRoute, {handler: Set})
     )
 );
 
@@ -45,7 +46,7 @@ Router.run(routes, function (Handler) {
 });
 
 
-},{"./components/About":198,"./components/Get":199,"./components/Set":200,"jquery":3,"react":197,"react-router":28}],2:[function(require,module,exports){
+},{"./components/About":198,"./components/Get":199,"./components/Header":200,"./components/NavBar":201,"./components/Set":202,"jquery":3,"react":197,"react-router":28}],2:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -32016,8 +32017,13 @@ var About = React.createClass({displayName: "About",
     render: function () {
         return (
             React.createElement("div", null, 
-                React.createElement("h1", null, "About"), 
-                React.createElement("p", null, "about")
+                React.createElement("ol", null, 
+                    React.createElement("li", null, React.createElement("a", {target: "_blank", href: "https://github.com/pinterest/snappass"}, "https://github.com/pinterest/snappass")), 
+                    React.createElement("li", null, React.createElement("a", {target: "_blank", href: "https://github.com/adarqui/snappass-nodejs-atrocious"}, "https://github.com/adarqui/snappass-nodejs-atrocious")), 
+                    React.createElement("li", null, React.createElement("a", {target: "_blank", href: "https://github.com/adarqui/snappass-core-go"}, "https://github.com/adarqui/snappass-core-go")), 
+                    React.createElement("li", null, React.createElement("a", {target: "_blank", href: "https://github.com/adarqui/snappass-backend-goji"}, "https://github.com/adarqui/snappass-backend-goji")), 
+                    React.createElement("li", null, React.createElement("a", {target: "_blank", href: "https://github.com/adarqui/snappass-static-react"}, "https://github.com/adarqui/snappass-frontend-react"))
+                )
             )
         );
     }
@@ -32057,7 +32063,6 @@ var Get = React.createClass({displayName: "Get",
     render: function () {
         return (
             React.createElement("div", null, 
-                React.createElement("h1", null, "Get"), 
                 React.createElement("p", null, this.state.password)
             )
         );
@@ -32069,6 +32074,58 @@ module.exports = Get;
 
 },{"jquery":3,"react":197,"react-router":28}],200:[function(require,module,exports){
 var React = require('react');
+
+var Header = React.createClass({displayName: "Header",
+    render: function () {
+        return (
+            React.createElement("div", {className: "page-header"}, 
+                React.createElement("h1", null, "SnapPass ", React.createElement("small", null, "Send one-time passwords to friends."))
+            )
+        );
+    }
+});
+
+module.exports = Header;
+
+
+},{"react":197}],201:[function(require,module,exports){
+var React = require('react');
+var Router = require('react-router');
+var Link = Router.Link;
+
+var NavBar = React.createClass({displayName: "NavBar",
+    mixins: [Router.State],
+    getInitialState: function() {
+        return {
+            locations: [{name:'set',title:'Set Password',active:''}, {name:'about',title:'About SnapPass',active:''}]
+        };
+    },
+    render: function() {
+        var locations = this.state.locations.map(function(location) {
+            var active = location.active || this.isActive(location.name) ? "active" : "";
+            return (
+                React.createElement("li", {className: active}, React.createElement(Link, {to: location.name}, location.title))
+            );
+        }.bind(this));
+        return (
+            React.createElement("nav", {className: "navbar navbar-default"}, 
+                React.createElement("div", {className: "container-fluid"}, 
+                    React.createElement("div", {className: "navbar-collapse"}, 
+                        React.createElement("ul", {className: "nav navbar-nav"}, 
+                            locations
+                        )
+                    )
+                )
+            )
+        );
+    }
+});
+
+module.exports = NavBar;
+
+
+},{"react":197,"react-router":28}],202:[function(require,module,exports){
+var React = require('react');
 var $ = require('jquery');
 var Link = require('react-router').Link;
 
@@ -32078,10 +32135,10 @@ var Set = React.createClass({displayName: "Set",
             result: ''
         };
     },
-    setPassword: function(password) {
+    setPassword: function(password, expire) {
         $.ajax({
             type: 'POST',
-            url: '/pass/'+password+'/day',
+            url: '/pass/'+password+'/'+expire,
             dataType: 'text',
             success: function(data) {
                 console.log('data',data);
@@ -32097,22 +32154,30 @@ var Set = React.createClass({displayName: "Set",
         console.log('submit');
         e.preventDefault();
         var password = React.findDOMNode(this.refs.password).value;
-        if (!password) {
-            return;
-        }
-        this.setPassword(password);
+        var expire = React.findDOMNode(this.refs.expire).value;
+        this.setPassword(password, expire);
         React.findDOMNode(this.refs.password).value = '';
     },
     render: function () {
         var result_url = '/#get/'+this.state.result;
         return (
             React.createElement("div", null, 
-                React.createElement("h1", null, "Set"), 
-                    React.createElement("form", {className: "setForm", onSubmit: this.handleSubmit}, 
-                        React.createElement("input", {type: "text", placeholder: "password", ref: "password"}), 
-                        React.createElement("input", {type: "submit", value: "Post"})
+                React.createElement("form", {className: "setForm", onSubmit: this.handleSubmit}, 
+                    React.createElement("div", {className: "form-group col-md-2"}, 
+                        React.createElement("input", {required: true, className: "form-control", type: "text", placeholder: "password", ref: "password"})
                     ), 
-                React.createElement("a", {href: result_url}, this.state.result)
+                    React.createElement("div", {className: "form-group col-md-2"}, 
+                        React.createElement("select", {className: "form-control", ref: "expire"}, 
+                            React.createElement("option", null, "hour"), 
+                            React.createElement("option", null, "day"), 
+                            React.createElement("option", null, "week")
+                        )
+                    ), 
+                    React.createElement("input", {className: "btn btn-default", type: "submit", value: "Post"})
+                ), 
+                React.createElement("div", {className: "col-md-12"}, 
+                    React.createElement("a", {href: result_url}, this.state.result)
+                )
             )
         );
     }
